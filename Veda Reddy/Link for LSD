@@ -2,3 +2,8 @@ http://docs.opencv.org/3.0-beta/modules/imgproc/doc/feature_detection.html
 
 The second code they've given here looks super similar (their image and output) to what we want with sari shelves. But I'm getting an "undefined reference to `cv::imread(cv::String const&, int)'" error. Code is in C++. If it gives satisfactory results we can convert. :)
 
+Is it LineSegmentDetector?
+Try out:
+      lsd = cv2.createLineSegmentDetector(0)
+	    lines = lsd.detect(new_img)[0]
+	    drawn_img = lsd.drawSegments(img,lines)
