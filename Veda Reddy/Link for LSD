@@ -7,3 +7,44 @@ Try out:
       lsd = cv2.createLineSegmentDetector(0)
 	    lines = lsd.detect(new_img)[0]
 	    drawn_img = lsd.drawSegments(img,lines)
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+img = cv2.imread('7.jpg', 0)
+img1 = cv2.imread('7.jpg',1)
+
+#clean up noise
+kernel = np.ones((3,3),np.uint8)
+opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+
+#canny edge detection
+edges = cv2.Canny(opening,50,200,apertureSize=3)
+img_color = cv2.cvtColor(edges,cv2.COLOR_GRAY2RGB)
+
+#probabilistic hough transform with parameters that seem to work best for our images
+minLineLength = 30
+maxLineGap = 10
+lines = cv2.HoughLinesP(edges,1,np.pi/180,80,minLineLength,maxLineGap)
+
+#superimpose detection of saris onto the image
+h=np.zeros((img.shape[0],img.shape[1]))
+p=np.zeros((img.shape[0],img.shape[1]))
+
+for i in range(0,lines.shape[0]):
+	for x1,y1,x2,y2 in lines[i]:
+		try:
+			cv2.line(img_color, (x1,y1), (x2,y2), (0,0,255), 1, 8)
+		except:
+			continue
+
+
+cv2.imshow('Original Image', img1)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+cv2.imshow('Image with Saris Detected', img_color)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
