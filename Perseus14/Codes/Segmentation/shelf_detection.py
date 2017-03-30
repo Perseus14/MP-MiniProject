@@ -18,10 +18,12 @@ def hough_transform(img,edges):
 	threshold = 200
 	
 	lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold)
+	
 	while(lines==None):
 		lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold)  # Hough line detection
 		threshold -= 1
 		print "None-",threshold
+	
 	while(len(lines) < 20):
 		lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold)  # Hough line detection
 		threshold -= 1
@@ -43,7 +45,7 @@ def hough_transform(img,edges):
 				y1 = int(y0 + 1000*(a))
 				x2 = int(x0 - 1000*(-b))
 				y2 = int(y0 - 1000*(a))
-				cv2.line(img,(x1,y1),(x2,y2),(0,0,255),1)
+				cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)
 				hough_lines.append(((x1, y1), (x2, y2)))
 			#cv2.line(h,(x1,y1),(x2,y2),(255,255,255),6)
 		except:
@@ -54,19 +56,19 @@ def hough_transform(img,edges):
 
 
 def Phough_transform(img,edges):
-	minLineLength = 30
-	maxLineGap = 10
+	minLineLength = 5
+	maxLineGap = 2
 	hough_lines=[]
 	lines = cv2.HoughLinesP(edges,1,np.pi/180,20,minLineLength,maxLineGap)
 	#lsd = cv2.createLineSegmentDetector(0)	
 	#lines=lsd.detect(img)	
 	for i in range(0,lines.shape[0]):
 		for x1,y1,x2,y2 in lines[i]:
-			cv2.line(img,(x1,y1),(x2,y2),(0,255,0),1)
+			cv2.line(img,(x1,y1),(x2,y2),(0,255,0),2)
 			hough_lines.append(((x1, y1), (x2, y2)))
 	return hough_lines
 
-# Random sampling of lines
+# Random sampling of lines 
 def sample_lines(lines, size):
 	if size > len(lines):
 		size = len(lines)
@@ -192,25 +194,25 @@ for img in b:
 		h_lines.append([(x1,y1),(x2,y2)])
 	'''
 	h_lines=hough_transform(img_c,edges)
-	print edges.shape,img.shape
+	#print edges.shape,img.shape
 	h=np.zeros((img.shape[0],img.shape[1]))
 	new_img=edges.copy()
 	for line in h_lines:
 		[(x1,y1),(x2,y2)]=line
 		cv2.line(h,(x1,y1),(x2,y2),(255,255,255),1)
-	print h.shape
-	cv2.imshow("img2",h);
+	#print h.shape
+	'''	
+	cv2.imshow("img2",img_c);
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
-	'''
-	for x in edges:
-		for y in x:
-			if(y==0):
-				y=255
-	'''
+	#cv2.imwrite(str(t)+"_idk.jpg",img_c)
+	#t+=1
+	
 	cv2.imshow("img2",edges);
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
+	'''	
+	
 	#new_img=cv2.bitwise_and(h,edges)
 	edges1 = cv2.Canny(opening,50,200)
 	for x in xrange(edges1.shape[0]):
@@ -220,21 +222,33 @@ for img in b:
 			else:
 				new_img[x][y]=0
 	#print new_img.type()
+		
+	'''	
 	cv2.imshow("img2",new_img);
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
+	'''
 	
 	#ph_lines=Phough_transform(img,new_img)
-
+	n_img = new_img.copy()
 	lsd = cv2.createLineSegmentDetector(0)
 	lines = lsd.detect(new_img)[0]
 	drawn_img = lsd.drawSegments(img,lines)
-	
+	'''
+	for x in xrange(img.shape[0]):
+		for y in xrange(img.shape[1]):
+			if(n_img[x][y]==255):
+				img[x][y]=(0,255,0)	
+		
 	cv2.imshow("img2",img);
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
-
-		
+	'''
+	
+	cv2.imwrite(str(t)+"_img_n.jpg",n_img)	
+	cv2.imwrite(str(t)+"_img.jpg",img)
+	t+=1	
+	
 	'''
 	print len(h_lines)
 	l= sample_lines(h_lines, 10)
